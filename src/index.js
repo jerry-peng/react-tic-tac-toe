@@ -73,6 +73,7 @@ class Game extends React.Component {
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
+    console.log(this.state.history)
   }
 
   jumpTo(step) {
@@ -89,7 +90,7 @@ class Game extends React.Component {
 
     const moves = history.map((step, move) => {
       const desc = move ?
-        `Go to move #${move} (${current.coor[0]}, ${current.coor[1]})` :
+        `Go to move #${move} (${step.coor[0]}, ${step.coor[1]})` :
         'Go to game start';
       return (
         <li key={move}>
