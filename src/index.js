@@ -15,31 +15,23 @@ class Board extends React.Component {
     return (
       <Square
         value={this.props.squares[i]}
+        key={i}
         onClick={() => this.props.onClick(i)}
       />
     );
   }
 
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
+    let board = []
+    for (let i = 0; i < 3; i++) {
+      let row = []
+      for (let j = 0; j < 3; j++) {
+        row.push(this.renderSquare(i * 3 + j));
+      }
+      board.push(<div key={i} className="board-row">{row}</div>);
+    }
+    board = <div>{board}</div>;
+    return board;
   }
 }
 
@@ -53,6 +45,7 @@ class Game extends React.Component {
       stepNumber: 0,
       xIsNext: true,
       jumped: false,
+      reverse: false,
     };
   }
 
@@ -84,14 +77,25 @@ class Game extends React.Component {
     });
   }
 
+  reverseOrder() {
+    this.setState({
+      reverse: !this.state.reverse,
+    })
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
-    const moves = history.map((step, move) => {
+    const moves = history.map((step, move, history) => {
+      if (this.state.reverse) {
+        move = history.length - 1 - move;
+        step = history[move];
+      }
+      
       let desc = move ?
-        (`Go to move #${move} (${step.coor[0]}, ${step.coor[1]})`) :
+        `Go to move #${move} (${step.coor[0]}, ${step.coor[1]})` :
         'Go to game start';
 
       if (this.state.jumped && move === this.state.stepNumber)
@@ -121,6 +125,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => this.reverseOrder()}>Toggle Order</button>
           <ol>{moves}</ol>
         </div>
       </div>
